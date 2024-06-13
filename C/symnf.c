@@ -6,6 +6,83 @@
 
 #define ITER 200
 
+/*
+Calculates the similarity matrix of X. 
+Input: a matrix X with N vectors of size d represented by a 1d array of size N*d
+Output: A matrix of dimension N*N represented by a 1d array of size N*N
+*/
+double* sym(double* X, int N, int d){
+    double* A = (double*) createArray(N*N, sizeof(double))
+    int i,j = 0
+    for (i; i<N; i++){
+        for(j; j<N; j++){
+            double a_i_j;
+            if(i !=j){
+                a_i_j = exp(-pow(euc_l2(X + d*i, X + d*j, d), 2)/2 )
+            } else{
+                a_i_j = 0
+            }
+            X[get_1d_index(i,j,d)] = a_i_j;
+        }
+    }
+    return A;
+}
+
+
+/*
+Calculates the diagonal degree Matrix
+Input: 1d array representing the similarity matrix A, the dimension N
+Output: 1d array representing the diagonal degree Matrix D based on A
+*/
+double* ddg(double* A, int N){
+    double* D = (double*) createArray(N*N, sizeof(double));
+    int i = 0;
+    for(i; i<N; i++){
+        double d_i = 0;
+        int j = 0;
+        for (j; j<N; j++)
+            d_i += A[get_1d_index(i, j, N)];
+        D[get_1d_index(i, i, N)] = d_i;
+    }
+    return D;
+}
+
+double* norm(double* A, double* D, int N){
+    double* D_invsqrt = calculate_inverse_square_root(D, N);
+    double* D_invsqrtA = matrix_multiply(D_invsqrt, A, N);
+    double* normalized = matrix_multiply(D_invsqrtA, D_invsqrt, N);
+    free(D_invsqrt);
+    free(D_invsqrtA);
+    return normalized;
+
+}
+
+void matrix_multiply(double* A, double* B, int N) {
+    double* C = (double*) createArray(N*N, sizeof(double));
+    for (int i = 0; i < N; i++)
+        for (int j = 0; j < N; j++) 
+            for (int k = 0; k < N; k++) 
+                C[get_1d_index(i,j,N)] += A[get_1d_index(i,k, N)] * B[get_1d_index(k, j, N)];
+    return C;
+
+}
+
+void calculate_inverse_square_root(double* D, int N) {
+    double* D_inv_sqrt = (double*) createArray(N*N, sizeof(double));
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            int i_j_index = get_1d_index(i, j, N);
+            if (i == j) {
+                D_inv_sqrt[i_j_index] = 1.0 / sqrt(D[i_j_index]);
+            } else {
+                D_inv_sqrt[i_j_index] = 0.0;
+            }
+        }
+    }
+    return D_inv_sqrt;
+}
+
+
 /*check if a string represents an integer*/
 int isStringDigit(const char *str)
 {
@@ -24,10 +101,11 @@ int isStringDigit(const char *str)
     return 1;
 }
 
+
 /*creates an array*/
 void *createArray(int n, int size)
 {
-    void *array = malloc(n * size);
+    void *array = calloc(n * size);
     if (array == NULL)
     {
         printf("An Error Has Occurred");
@@ -77,4 +155,18 @@ double euc_l2(double *v1, double *v2, int d)
     }
 
     return sqrt(dist);
+}
+
+double* extract_vector(double* X, int index,  int d){
+    double* vector = (double*) createArray(d, sizeof(double));
+    int i = 0
+    int start = index*d;
+    for(i; i < d; i++){
+        vector[i] = X[start+i];
+    }
+    return vector;
+}
+
+int get_1d_index(int i, int j, int d){
+    return i*d+j;
 }
