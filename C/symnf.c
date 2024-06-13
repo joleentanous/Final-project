@@ -47,6 +47,12 @@ double* ddg(double* A, int N){
     return D;
 }
 
+
+/*
+Calculates the  normalized similarity matrix
+Input: two 1d arrays representing the similarity matrix A and the ddg matrix D , the dimension N
+Output: 1d array representing the  normalized similarity matrix D^-1/2AD^-1/2
+*/
 double* norm(double* A, double* D, int N){
     double* D_invsqrt = calculate_inverse_square_root(D, N);
     double* D_invsqrtA = matrix_multiply(D_invsqrt, A, N);
