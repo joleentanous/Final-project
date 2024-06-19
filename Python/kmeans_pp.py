@@ -4,7 +4,9 @@ import sys
 import numpy as np
 np.random.seed(0)
 
-error_messages = {"k": "An Error Has Occurred"}
+def error():
+    print("An Error Has Occurred")
+    exit()
 def read(data):
     df = pd.read_csv(data, header=None)
     np_array = df.to_numpy()
@@ -25,10 +27,12 @@ def symnmf(X, N, k):
     H = initH(W,k)
     return g.symnmf(W, H, N, k)
 
+
 def printMatrix(matrix):
     for row in matrix:
         print(",".join(map(str, row)))
     print("")
+
 
 
 def sym(X, N, d):
@@ -46,28 +50,43 @@ def norm(A, D, N):
 
 
 def main():
-    k=goal=file_name = None
+    goals = ['symnmf', 'sym', 'ddg', 'norm']
+    k = goal = file_name = None
     args = sys.argv
-    k= (args[1])
-    goal= (args[2])
-    file_name= (args[3])
-    matrix=read(file_name)
-    N=matrix.shape[0]
-    if (k>=N or not k.isdigit()):
-        return print(error_messages["k"])
-    d=matrix.shape[1]
-    if (goal=='symnmf'):
+    if (len(args) != 4):
+        error()
+    k = (args[1])
+    goal = (args[2])
+    file_name = (args[3])
+    matrix = read(file_name)
+    N = matrix.shape[0]
+    try:
+        k = int(k)
+        goal = str(goal)
+        file_name = str(file_name)
+    except:
+        error()
+
+    if (k >= N) or (k <= 1) or (goal not in goals):
+        error()
+
+
+
+    d = matrix.shape[1]
+    if goal == 'symnmf':
         res = symnmf(matrix,k)
         printMatrix(matrix)
     else:
-        if (goal=='sym'):
+        if goal == 'sym':
             res = sym(matrix,N,d)
-        elif (goal=='ddg'):
+        elif goal == 'ddg':
             A = sym(matrix, N, d)
             res = ddg(A,N)
-        else:
+        elif goal == 'norm':
             A = sym(matrix,N,d)
             D = ddg(A,N)
             res = norm(A, D, N)
+        else:
+            error()
         printMatrix(matrix)
 
