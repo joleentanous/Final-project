@@ -181,7 +181,7 @@ void parse_input(PyObject *args, int *K, int *N, int *d, int *iter, double *epsi
     *data_array = convert_list_to_double_array(data_list_ptr);
 }
 
-static PyObject *fit(PyObject *self, PyObject *args)
+static PyObject *symnmf(PyObject *self, PyObject *args)
 {
     int K, N, d, iter;
     double epsilon;
@@ -195,13 +195,41 @@ static PyObject *fit(PyObject *self, PyObject *args)
     return convert_array_to_python_list(spread_centroids, K * d);
 }
 
+static PyObject *sym(PyObject *self, PyObject *args)
+{
+    
+}
+
+static PyObject *ddg(PyObject *self, PyObject *args)
+{
+    
+}
+
+static PyObject *norm(PyObject *self, PyObject *args)
+{
+    
+}
+
+
 static PyMethodDef geoMethods[] = {
-    {"fit",            /* the Python method name that will be used */
-     (PyCFunction)fit, /* the C-function that implements the Python function and returns static PyObject*  */
+    {"symnmf",            /* the Python method name that will be used */
+     (PyCFunction)symnmf, /* the C-function that implements the Python function and returns static PyObject*  */
      METH_VARARGS,     /* flags indicating parameters
 accepted for this function */
-     PyDoc_STR("Calculates k_means")},
+     PyDoc_STR("Computes the whole process of symnmf")},
     /*  The docstring for the function */
+    {"sym",
+    (PyCFunction)sym,
+    METH_VARARGS,
+    PyDoc_STR("Computes sym part")},
+    {"ddg",
+    (PyCFunction)ddg,
+    METH_VARARGS,
+    PyDoc_STR("Computes ddg part")},
+    {"norm",
+    (PyCFunction)norm,
+    METH_VARARGS,
+    PyDoc_STR("Computes ddg part")},
     {NULL, NULL, 0, NULL}, /* The last entry must be all NULL as shown to act as a
                               sentinel. Python looks for this entry to know that all
                                 of the functions for the module have been defined. */
