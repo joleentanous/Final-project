@@ -1,6 +1,6 @@
 #include <Python.h>
 #define PY_SSIZE_T_CLEAN
-#include "kmeans.h"
+#include "symnmf.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -237,7 +237,7 @@ accepted for this function */
 
 static struct PyModuleDef geomodule = {
     PyModuleDef_HEAD_INIT,
-    "kmeansmodule", /* name of module */
+    "symnmfmodule", /* name of module */
     NULL,           /* module documentation, may be NULL */
     -1,             /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
     geoMethods      /* the PyMethodDef array from before containing the methods of the extension */
