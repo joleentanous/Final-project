@@ -89,4 +89,3 @@ def main():
         else:
             error()
         printMatrix(matrix)
-

@@ -51,13 +51,6 @@ void print2DArray(double **arr, int rows, int cols)
     }
 }
 
-double *k_means_wrapper(int K, int N, int d, int iter, double epsilon, int *indices, double **data)
-{
-    double **centroids = k_means(K, N, d, epsilon, iter, indices, data);
-    double *spread_centroids = spread_matrix(centroids, K, d);
-    free_matrix(centroids, K);
-    return spread_centroids;
-}
 
 void print_matrix(int **matrix, int rows, int cols)
 {
@@ -166,47 +159,145 @@ void *convert_list_to_double_array(PyObject *list)
     return arr;
 }
 
-void parse_input(PyObject *args, int *K, int *N, int *d, int *iter, double *epsilon, int **indexes, double **data_array)
+void parse_input_symnmf(PyObject *args, double **W_array, double **H_array, int *N, int *k)
 {
-    // PyObject *lst;
-    PyObject *indexes_list_ptr;
-    PyObject *data_list_ptr;
+    
+    PyObject *W_list_ptr;
+    PyObject *H_list_ptr;
     /* This parses the Python arguments into a double (d)  variable named z and int (i) variable named n*/
-    if (!PyArg_ParseTuple(args, "iiiidOO", K, N, d, iter, epsilon, &indexes_list_ptr, &data_list_ptr))
+    if (!PyArg_ParseTuple(args, "OOii", &W_list_ptr, &H_list_ptr, N, k))
     {
         return NULL;
     }
-    // *data = process_matrix_interface(data_list_ptr);
-    *indexes = convert_list_to_int_array(indexes_list_ptr);
-    *data_array = convert_list_to_double_array(data_list_ptr);
+    
+    *W_array = convert_list_to_double_array(W_list_ptr);
+    *H_array = convert_list_to_double_array(H_list_ptr);
+}
+
+
+double *symnmf_wrapper(double **w, double **h, int N, int k)
+{
+    /*(W, H, N, k)*/
+    double **symnmf = symnmf(W, H, N, k);
+    double *symnmf_vectors = spread_matrix(symnmf, N, k);
+    free_matrix(symnmf, N);
+    return symnmf_vectors;
+    
 }
 
 static PyObject *symnmf(PyObject *self, PyObject *args)
 {
-    int K, N, d, iter;
-    double epsilon;
-    int *initial_centroid_indexes;
-    double *data_array;
-    double **data_matrix;
+    int N, k;
+    double *W_array, *H_array;
+    double **W_matrix, **H_matrix;
+    parse_input_norm(args, &W_array, &H_array, &N, &k);
+    W_matrix = convert_array_to_matrix(W_array, N, N);
+    H_matrix = convert_array_to_matrix(H_array, N, N);
+    double *symnmf_vectors = symnmf_wrapper(W_matrix, H_matrix, N, k);
+    return convert_array_to_python_list(symnmf_vectors, N * k);
+}
 
-    parse_input(args, &K, &N, &d, &iter, &epsilon, &initial_centroid_indexes, &data_array);
-    data_matrix = convert_array_to_matrix(data_array, N, d);
-    double *spread_centroids = k_means_wrapper(K, N, d, iter, epsilon, initial_centroid_indexes, data_matrix);
-    return convert_array_to_python_list(spread_centroids, K * d);
+
+void parse_input_sym(PyObject *args, double **data_array, int *N, int *d)
+{
+    PyObject *data_list_ptr;
+    /* This parses the Python arguments into a double (d)  variable named z and int (i) variable named n*/
+    if (!PyArg_ParseTuple(args, "Oii", &data_list_ptr, N, d))
+    {
+        return NULL;
+    }
+    *data_array = convert_list_to_double_array(data_list_ptr);
+}
+
+double *sym_wrapper(double **X, int N, int d)
+{
+    double **sym = sym(X, N, d);
+    double *sym_vectors = spread_matrix(sym, N, N);
+    free_matrix(sym, N);
+    return sym_vectors;
+    
 }
 
 static PyObject *sym(PyObject *self, PyObject *args)
 {
+    int N,d;
+    double *X_array;
+    double **X_matrix;
+    parse_input_sym(args, &X_array, &N, &d);
+    X_matrix = convert_array_to_matrix(X_array, N, d);
+    double *sym_vectors = sym_wrapper(X_matrix, N, d);
+    return convert_array_to_python_list(sym_vectors, N * N);
+}
+
+
+void parse_input_ddg(PyObject *args, double **data_array, int *N)
+{
+    PyObject *data_list_ptr;
+    /* This parses the Python arguments into a double (d)  variable named z and int (i) variable named n*/
+    if (!PyArg_ParseTuple(args, "Oi", &data_list_ptr, N))
+    {
+        return NULL;
+    }
+    *data_array = convert_list_to_double_array(data_list_ptr);
+}
+
+
+double *ddg_wrapper(double **A, int N)
+{
+    double **ddg = ddg(A, N);
+    double *ddg_vectors = spread_matrix(ddg, N, N);
+    free_matrix(ddg, N);
+    return ddg_vectors;
     
 }
 
 static PyObject *ddg(PyObject *self, PyObject *args)
 {
+    int N;
+    double *A_array;
+    double **A_matrix;
+    parse_input_ddg(args, &A_array, &N);
+    A_matrix = convert_array_to_matrix(A_array, N, N);
+    double *ddg_vectors = ddg_wrapper(A_matrix, N);
+    return convert_array_to_python_list(ddg_vectors, N * N);
+}
+
+
+
+void parse_input_norm(PyObject *args, double **A_array, double **D_array, int *N)
+{
+    PyObject *A_list_ptr;
+    PyObject *D_list_ptr;
+
+    /* This parses the Python arguments into a double (d)  variable named z and int (i) variable named n*/
+    if (!PyArg_ParseTuple(args, "OOi", &A_list_ptr, &D_list_ptr, N))
+    {
+        return NULL;
+    }
+    *A_array = convert_list_to_double_array(A_list_ptr);
+    *D_array = convert_list_to_double_array(D_list_ptr);
+}
+
+
+double *norm_wrapper(double **A, double **A, int N)
+{
+    double **norm = norm(A, D, N);
+    double *norm_vectors = spread_matrix(norm, N, N);
+    free_matrix(norm, N);
+    return norm_vectors;
     
 }
 
 static PyObject *norm(PyObject *self, PyObject *args)
 {
+    int N;
+    double *A_array, *D_array;
+    double **A_matrix, **D_matrix;
+    parse_input_norm(args, &A_array, &D_array, &N);
+    A_matrix = convert_array_to_matrix(A_array, N, N);
+    D_matrix = convert_array_to_matrix(D_array, N, N);
+    double *norm_vectors = norm_wrapper(A_matrix, D_matrix, N);
+    return convert_array_to_python_list(norm_vectors, N * N);
     
 }
 
@@ -214,8 +305,7 @@ static PyObject *norm(PyObject *self, PyObject *args)
 static PyMethodDef geoMethods[] = {
     {"symnmf",            /* the Python method name that will be used */
      (PyCFunction)symnmf, /* the C-function that implements the Python function and returns static PyObject*  */
-     METH_VARARGS,     /* flags indicating parameters
-accepted for this function */
+     METH_VARARGS,     /* flags indicating parameters accepted for this function */
      PyDoc_STR("Computes the whole process of symnmf")},
     /*  The docstring for the function */
     {"sym",
@@ -243,10 +333,10 @@ static struct PyModuleDef geomodule = {
     geoMethods      /* the PyMethodDef array from before containing the methods of the extension */
 };
 
-PyMODINIT_FUNC PyInit_kmeansmodule(void)
+PyMODINIT_FUNC PyInit_symnmfsmodule(void)
 {
     PyObject *m;
-    m = PyModule_Create(&geomodule);
+    m = PyModule_Create(&symnmfmodule);
     if (!m)
     {
         return NULL;
