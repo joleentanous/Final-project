@@ -73,7 +73,7 @@ int main() {
     printf("Optimized H Matrix:\n");
     printMatrix(optimizedH, N, k);
 
-    free(optimizedH); 
+    /*free(optimizedH);*/
 
     return 0;
 }
@@ -179,7 +179,7 @@ double* symnmf(double* W, double* H, int N, int k ){
     free(H_transposed);
     free(HH_T);
     free(HH_TH);
-    free(H_next);
+    /*free(H_next);*/
     return H_curr;
 }
 
@@ -237,25 +237,6 @@ void copyArray(double* A, double* B, int size) {
 }
 
 
-/*check if a string represents an integer*/
-int isStringDigit(const char *str)
-{
-    /* Iterate through each character in the string*/
-    int i;
-    for (i = 0; str[i] != '\0'; i++)
-    {
-        /* Check if the character is not a digit*/
-        if (!isdigit(str[i]))
-        {
-            /* If any character is not a digit, return false*/
-            return 0;
-        }
-    }
-    /* If all characters are digits, return true*/
-    return 1;
-}
-
-
 /*creates an array*/
 void *createArray(int n, int size)
 {
@@ -268,33 +249,6 @@ void *createArray(int n, int size)
     return array;
 }
 
-/*creates a submatrix*/
-double **sub_matrix_k(double **matrix, int k, int d, int *indexes)
-{
-    int i;
-    int j;
-    double **sub_array;
-    sub_array = malloc(k * sizeof(double *));
-    for (i = 0; i < k; i++)
-    {
-        sub_array[i] = (double *)createArray(d, sizeof(double));
-        for (j = 0; j < d; j++)
-        {
-            sub_array[i][j] = matrix[indexes[i]][j];
-        }
-    }
-
-    return sub_array;
-}
-
-/*used to free memory*/
-void free_matrix(double **matrix, int k)
-{
-    int i;
-    for (i = 0; i < k; i++)
-        free(matrix[i]);
-    free(matrix);
-}
 
 /*calculates the euc distance between two given vectors*/
 double euc_l2(double *v1, double *v2, int d)
@@ -310,20 +264,9 @@ double euc_l2(double *v1, double *v2, int d)
     return sqrt(dist);
 }
 
-double* extract_vector(double* X, int index,  int d){
-    double* vector = (double*) createArray(d, sizeof(double));
-    int i;
-    int start = index*d;
-    for(i = 0; i < d; i++){
-        vector[i] = X[start+i];
-    }
-    return vector;
-}
-
 int get_1d_index(int i, int j, int d){
     return i*d+j;
 }
-
 
 
 void printMatrix(double* matrix, int rows, int cols) {
