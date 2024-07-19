@@ -4,6 +4,15 @@ import sys
 import numpy as np
 np.random.seed(0)
 
+# symnmfmodule functions:
+# All functions in the module accept a 1-d ==== PYTHON LIST ==== 
+# Module functions:
+# module_sym:  args: (X, N, k) where X is a py list (dim N*k), N, k integers
+# module_ddg:  args: (X, N) where X is a py list (dim N*N), N integer
+# module_norm:  args: (X, Y, N) where X and Y are  py lists (dim N*N), N integer
+# module_symnmf:  args: (X, Y, N) where X and Y are  py lists (X with dim N*N, Y with dim N*k), N, k integers
+
+
 def error():
     print("An Error Has Occurred")
     exit()

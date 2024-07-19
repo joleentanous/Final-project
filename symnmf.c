@@ -22,7 +22,7 @@ double* symnmf(double* W, double* H, int N, int k);
 void copyArray(double* A, double* B, int size);
 
 int main() {
-    /* 
+
     int N = 3;
     int d = 2;
 
@@ -32,9 +32,22 @@ int main() {
         5.0, 6.0
     };
 
+        double W[] = {
+        0.000000, 0.707105, 0.000006,
+        0.707105, 0.000000, 0.707105,
+        0.000006, 0.707105, 0.000000
+    };
+
+    double H[] = {
+        0.5, 0.6,
+        0.3, 0.8,
+        0.9, 0.1
+    };
+
     double* similarityMatrix;
     double* ddg_matrix;
     double* normalized_matrix;
+    double* optimizedH ;
 
     similarityMatrix = sym(X, N, d);
 
@@ -51,29 +64,16 @@ int main() {
     printMatrix(normalized_matrix, N, N);
     free(similarityMatrix);
     free(ddg_matrix);
-    */
 
-    int N = 3; 
-    int k = 2;
+    N = 3; 
+    d = 2;
 
-    double W[] = {
-        0.000000, 0.707105, 0.000006,
-        0.707105, 0.000000, 0.707105,
-        0.000006, 0.707105, 0.000000
-    };
-
-    double H[] = {
-        0.5, 0.6,
-        0.3, 0.8,
-        0.9, 0.1
-    };
-
-    double* optimizedH = symnmf(W, H, N, k);
+    optimizedH = symnmf(W, H, N, d);
 
     printf("Optimized H Matrix:\n");
-    printMatrix(optimizedH, N, k);
+    printMatrix(optimizedH, N, d);
 
-    /*free(optimizedH);*/
+    free(optimizedH);
 
     return 0;
 }
@@ -86,6 +86,7 @@ Output: A matrix of dimension N*N represented by a 1d array of size N*N
 double* sym(double* X, int N, int d){
     double* A = (double*) createArray(N*N, sizeof(double));
     int i,j;
+    printf("Calling sym\n");
     for (i = 0; i<N; i++){
         double a_i_j;
         for(j=0; j<N; j++){
@@ -159,6 +160,7 @@ double* symnmf(double* W, double* H, int N, int k ){
         int i;
         int j;
         double diff;
+        printf("working\n");
         matrix_multiply(W, H_curr, WH, N, N, k);
         transpose_matrix(H_curr, H_transposed, N, k);
         matrix_multiply(H_curr, H_transposed, HH_T, N, k, N);
