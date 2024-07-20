@@ -84,7 +84,7 @@ def main():
     d = matrix.shape[1]
     if goal == 'symnmf':
         res = symnmf(matrix,k)
-        printMatrix(matrix)
+        printMatrix(res)
     else:
         if goal == 'sym':
             res = sym(matrix,N,d)
@@ -97,9 +97,9 @@ def main():
             res = norm(A, D, N)
         else:
             error()
-        printMatrix(matrix)
+        printMatrix(res)
 
 try:
     main()
 except Exception as e:
-    print("An Error Has Occurred")
+    error()
