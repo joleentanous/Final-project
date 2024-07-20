@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
+#include <string.h>
 
-#define ITER 200
+#define ITER 300
 #define BETA 0.5
 #define EPSILON 1e-4
+#define ERROR_MSG "An Error Has Occurred"
 
 double* sym(double* X, int N, int d);
 void printMatrix(double* matrix, int rows, int cols);
@@ -21,7 +23,87 @@ double frobenius_norm(double* A, double* B, int N, int K);
 double* symnmf(double* W, double* H, int N, int k);
 void copyArray(double* A, double* B, int size);
 
-int main() {
+
+
+int main(int argc, char *argv[]) {
+    char *goal, *file_path;
+    int i, N, d, ch;
+    double *data, *similarity, *Diagonal, *Normalized;
+    FILE *file;
+
+    if(argc != 3){
+        printf(ERROR_MSG);
+        exit(1);
+    }
+    goal = argv[1];
+    file_path = argv[2];
+    
+    file = fopen(file_path, "r");
+    if (file == NULL) {
+        printf(ERROR_MSG);
+        exit(1);
+    }
+
+    /*get the dimensions of the file matrix*/ 
+    
+    while ((ch = fgetc(file)) != EOF) {
+        if (ch == '\n') {
+            N++;
+        } else {
+            d++;
+        }
+    }
+
+    /*creates a 1D matrix of length N*d of the given vectors*/
+
+    data = (double*)createArray(N * d, sizeof(double));
+    for (i = 0; i < N; i++) {
+        int j;
+        for (j = 0; j < d; j++) {
+            if (fscanf(file, "%lf", &data[i * d + j]) != 1) {
+                printf(ERROR_MSG);
+                fclose(file);
+                exit(1);
+            }
+        }
+    }
+
+    if (strcmp(goal, "sym") == 0){
+        similarity = sym(data, N, d);
+        printMatrix(similarity, N, N);
+        free(similarity);
+        
+    }
+    if (strcmp(goal, "ddg") == 0){
+        similarity = sym(data, N, d);
+        Diagonal = ddg(similarity, N);
+        printMatrix(Diagonal, N, N);
+        free(similarity);
+        free(Diagonal);
+
+    }
+    if (strcmp(goal, "norm") == 0){
+        similarity = sym(data, N, d);
+        Diagonal = ddg(similarity, N);
+        Normalized = norm(similarity,Diagonal, N);
+        printMatrix(Normalized, N, N);
+        free(similarity);
+        free(Diagonal);
+        free(Normalized);
+    }
+
+    else{
+        printf(ERROR_MSG);
+        free(data);
+        exit(1);
+    }
+    free(data);
+    
+    return 0;
+}
+
+
+/*int main() {
 
     int N = 3;
     int d = 2;
@@ -76,13 +158,17 @@ int main() {
     free(optimizedH);
 
     return 0;
-}
+}*/
+
+
+
 
 /*
 Calculates the similarity matrix of X. 
 Input: a matrix X with N vectors of size d represented by a 1d array of size N*d
 Output: A matrix of dimension N*N represented by a 1d array of size N*N
 */
+
 double* sym(double* X, int N, int d){
     double* A = (double*) createArray(N*N, sizeof(double));
     int i,j;
@@ -275,8 +361,11 @@ void printMatrix(double* matrix, int rows, int cols) {
     int i, j;
     for (i = 0; i < rows; ++i) {
         for (j = 0; j < cols; ++j) {
-            printf("%f ", matrix[i * cols + j]);
+            printf("%.4f", matrix[i * cols + j]);
+            if (j < cols - 1) printf(",");
         }
         printf("\n");
     }
 }
+
+

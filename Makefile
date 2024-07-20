@@ -1,6 +1,7 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -ansi -Wall -Wextra -Werror -pedantic-errors -lm
+CFLAGS = -ansi -Wall -Wextra -Werror -pedantic-errors
+LDFLAGS = -lm
 
 # Target executable
 TARGET = symnmf
@@ -9,7 +10,7 @@ TARGET = symnmf
 SRCS = symnmf.c
 
 # Header files
-HDRS = symnf.h
+HDRS = symnmf.h
 
 # Object files
 OBJS = $(SRCS:.c=.o)
@@ -19,7 +20,7 @@ all: $(TARGET)
 
 # Build target executable
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 # Compile source files to object files
 %.o: %.c $(HDRS)
