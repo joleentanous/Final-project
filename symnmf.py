@@ -98,3 +98,8 @@ def main():
         else:
             error()
         printMatrix(matrix)
+
+try:
+    main()
+except Exception as e:
+    print("An Error Has Occurred")
