@@ -95,7 +95,6 @@ if __name__ == "__main__":
     
     if goal == 'symnmf':
         res = symnmf(matrix,N,k)
-        print(res)
         printMatrix(res, N, k)
     else:
         if goal == 'sym':
