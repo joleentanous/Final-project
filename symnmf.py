@@ -14,30 +14,36 @@ np.random.seed(0)
 
 
 def error():
-    print("An Error Has Occurred")
+    print("An Error Has Occurred, python")
     exit()
+
 def read(data):
+    print(2)
     df = pd.read_csv(data, header=None)
+    print(3)
     np_array = df.to_numpy()
+    print(np_array)
     return np_array
 
 
 #initialization of the H matrix
-def initH(W,k):
-    n = W.shape[0]
+def initH(N,W,k):
     m = np.mean(W)
-    H = np.random.uniform(0, 2 * np.sqrt(m / k), (n, k))
+    H = np.random.uniform(0, 2 * np.sqrt(m / k), (N, k))
+    H = H.flatten().tolist()
     return H
 
 def symnmf(X, N, k):
     A = sym(X, N, k)
     D = ddg(A, N)
     W = norm(A, D, N)
-    H = initH(W,k)
-    return g.symnmf(W, H, N, k)
+    H = initH(N,W,k)
+    return g.module_symnmf(W, H, N, k)
 
 
-def printMatrix(matrix):
+def printMatrix(matrix , N, K):
+    matrix = np.array(matrix).reshape(N, K)
+    matrix = [[round(num, 4) for num in row] for row in matrix]
     for row in matrix:
         print(",".join(map(str, row)))
     print("")
@@ -45,15 +51,15 @@ def printMatrix(matrix):
 
 
 def sym(X, N, d):
-    return g.sym(X,N,d)
+    return g.module_sym(X,N,d)
 
 
 def ddg(A, N):
-    return g.ddg(A, N)
+    return g.module_ddg(A, N)
 
 
 def norm(A, D, N):
-    return g.norm(A, D, N)
+    return g.module_norm(A, D, N)
 
 
 
@@ -67,6 +73,7 @@ def main():
     k = (args[1])
     goal = (args[2])
     file_name = (args[3])
+    print(1)
     matrix = read(file_name)
     N = matrix.shape[0]
     try:
@@ -82,9 +89,13 @@ def main():
 
 
     d = matrix.shape[1]
+    matrix = matrix.flatten().tolist()
+    print(matrix)
+    print(4)
     if goal == 'symnmf':
-        res = symnmf(matrix,k)
-        printMatrix(res)
+        res = symnmf(matrix,N,k)
+        print(res)
+        printMatrix(res, N, k)
     else:
         if goal == 'sym':
             res = sym(matrix,N,d)
@@ -97,9 +108,11 @@ def main():
             res = norm(A, D, N)
         else:
             error()
-        printMatrix(res)
+        printMatrix(res, N, N)
 
-try:
-    main()
-except Exception as e:
-    error()
+# try:
+#     main()
+# except Exception as e:
+#     error()
+
+main()
