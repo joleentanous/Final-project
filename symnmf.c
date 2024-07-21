@@ -19,10 +19,11 @@ void matrix_multiply(double* A, double* B, double* C, int N, int d, int K);
 double* ddg(double* A, int N);
 double* norm(double* A, double* D, int N);
 void transpose_matrix(double* A, double* transposed, int N, int d);
-double frobenius_norm(double* A, double* B, int N, int K);
+double frobenius_norm(double* H, double* H_next, int N, int k);
 double* symnmf(double* W, double* H, int N, int k);
 void copyArray(double* A, double* B, int size);
-
+void matrix_product_HHT(double* H, double* HHT, int N, int k);
+void matrix_product_WH(double* W, double* H, double* WH, int N, int k)
 
 
 #define INITIAL_BUFFER_SIZE 128
@@ -385,17 +386,6 @@ void transpose_matrix(double* A, double* transposed, int N, int d) {
     }
 }
 
-double frobenius_norm(double* A, double* B, int N, int K) {
-    double sum = 0.0;
-    int i;
-    for (i = 0; i < N * K; i++) {
-        double diff = A[i] - B[i];
-        sum += diff * diff;
-    }
-
-    return sum;
-}
-
 void copyArray(double* A, double* B, int size) {
     int i;
     for (i = 0; i < size; i++) {
@@ -448,3 +438,70 @@ void printMatrix(double* matrix, int rows, int cols) {
 }
 
 
+
+double frobenius_norm(double* H, double* H_next, int N, int k) {
+    int i;
+    double norm = 0.0;
+    for (i = 0; i < N * k; i++) {
+        norm += (H[i] - H_next[i]) * (H[i] - H_next[i]);
+    }
+    return sqrt(norm);
+}
+
+void matrix_product_WH(double* W, double* H, double* WH, int N, int k) {
+    int i,j,l;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < k; j++) {
+            WH[i * k + j] = 0.0;
+            for (l = 0; l < N; l++) {
+                WH[i * k + j] += W[i * N + l] * H[l * k + j];
+            }
+        }
+    }
+}
+
+void matrix_product_HHT(double* H, double* HHT, int N, int k) {
+    int i,j,l;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            HHT[i * N + j] = 0.0;
+            for (l = 0; l < k; l++) {
+                HHT[i * N + j] += H[i * k + l] * H[j * k + l];
+            }
+        }
+    }
+}
+
+double* symnmf(double* W, double* H, int N, int k) {
+    int i,j, iter;
+    const int ITER = 300;
+    const double EPSILON = 1e-5;
+    const double b = 0.5;
+    double* H_next = (double*) malloc(N * k * sizeof(double));
+    double* WH = (double*) malloc(N * k * sizeof(double));
+    double* HHT = (double*) malloc(N * N * sizeof(double));
+    
+    for (iter = 0; iter < ITER; iter++) {
+        matrix_product_WH(W, H, WH, N, k);
+        matrix_product_HHT(H, HHT, N, k);
+
+        for (i = 0; i < N; i++) {
+            for (j = 0; j < k; j++) {
+                double numerator = WH[i * k + j];
+                double denominator = HHT[i * N + i] + EPSILON; 
+                H_next[i * k + j] = H[i * k + j] * (1 - b + b * (numerator / denominator));
+            }
+        }
+
+        if (frobenius_norm(H, H_next, N, k) < EPSILON) {
+            break;
+        }
+
+        memcpy(H, H_next, N * k * sizeof(double));
+    }
+
+    free(WH);
+    free(HHT);
+
+    return H_next;
+}
