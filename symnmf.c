@@ -23,7 +23,7 @@ double frobenius_norm(double* H, double* H_next, int N, int k);
 double* symnmf(double* W, double* H, int N, int k);
 void copyArray(double* A, double* B, int size);
 void matrix_product_HHT(double* H, double* HHT, int N, int k);
-void matrix_product_WH(double* W, double* H, double* WH, int N, int k)
+void matrix_product_WH(double* W, double* H, double* WH, int N, int k);
 
 
 #define INITIAL_BUFFER_SIZE 128
@@ -314,6 +314,8 @@ Input: W - 1d array representation of the NxN normalized similarity matrix
 H - 1d array representation of a Nxk randomly initialized matrix
 Output: Optimized H
 */
+
+
 double* symnmf(double* W, double* H, int N, int k ){
     int iter = 0;
     double* H_curr = H;
@@ -338,6 +340,9 @@ double* symnmf(double* W, double* H, int N, int k ){
             }
         }
         diff = frobenius_norm(H_next, H_curr, N, k);
+        printf("The frobenius is: %f\n", diff);
+        printf("%s", "H_in joleen and tamer");
+        printMatrix(H_curr,N,k);
         copyArray(H_next, H_curr, N*k);
         if (diff < EPSILON)
             break;
@@ -347,12 +352,17 @@ double* symnmf(double* W, double* H, int N, int k ){
     free(H_transposed);
     free(HH_T);
     free(HH_TH);
-    /*free(H_next);*/
     return H_curr;
+}
+
+int get_1d_index(int i, int j, int d){
+    return i*d+j;
 }
 
 void matrix_multiply(double* A, double* B, double* C, int N, int d, int K) {
     int i,j,k;
+    for (i = 0; i < N*K; i++)
+                C[i] = 0;
     for (i = 0; i < N; i++)
         for (j = 0; j < K; j++) 
             for (k = 0; k < d; k++)
@@ -376,7 +386,9 @@ double* calculate_inverse_square_root(double* D, int N) {
 }
 
 
-
+int get_1d_index(int i, int j, int d){
+    return i*d+j;
+}
 void transpose_matrix(double* A, double* transposed, int N, int d) {
     int i,j;
     for (i = 0; i < N; i++) {
@@ -472,36 +484,3 @@ void matrix_product_HHT(double* H, double* HHT, int N, int k) {
     }
 }
 
-double* symnmf(double* W, double* H, int N, int k) {
-    int i,j, iter;
-    const int ITER = 300;
-    const double EPSILON = 1e-5;
-    const double b = 0.5;
-    double* H_next = (double*) malloc(N * k * sizeof(double));
-    double* WH = (double*) malloc(N * k * sizeof(double));
-    double* HHT = (double*) malloc(N * N * sizeof(double));
-    
-    for (iter = 0; iter < ITER; iter++) {
-        matrix_product_WH(W, H, WH, N, k);
-        matrix_product_HHT(H, HHT, N, k);
-
-        for (i = 0; i < N; i++) {
-            for (j = 0; j < k; j++) {
-                double numerator = WH[i * k + j];
-                double denominator = HHT[i * N + i] + EPSILON; 
-                H_next[i * k + j] = H[i * k + j] * (1 - b + b * (numerator / denominator));
-            }
-        }
-
-        if (frobenius_norm(H, H_next, N, k) < EPSILON) {
-            break;
-        }
-
-        memcpy(H, H_next, N * k * sizeof(double));
-    }
-
-    free(WH);
-    free(HHT);
-
-    return H_next;
-}
