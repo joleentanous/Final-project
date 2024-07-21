@@ -43,9 +43,10 @@ def symnmf(X, N, k):
 #prints to STDOUT 
 def printMatrix(matrix , N, K):
     matrix = np.array(matrix).reshape(N, K)
-    matrix = [[round(num, 4) for num in row] for row in matrix]
+    #matrix = [[round(num, 4) for num in row] for row in matrix]
     for row in matrix:
-        print(",".join(map(str, row)))
+        fixedRow = ["%.4f" % num for num in row]
+        print(",".join(map(str, fixedRow)))
     print("")
 
 
@@ -76,9 +77,12 @@ if __name__ == "__main__":
     file_name = (args[3])
     if not file_name.endswith('.txt'):  # check filename extension
         error()
-    matrix = read(file_name)
-    N = matrix.shape[0]
+    try:
+        matrix = read(file_name)
+    except Exception as e:
+        error()
     
+    N = matrix.shape[0]
     #input validation
     try:
         k = int(k)
@@ -114,4 +118,3 @@ if __name__ == "__main__":
 #     main()
 # except Exception as e:
 #     error()
-
