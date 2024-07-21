@@ -28,11 +28,12 @@ def read(data):
 #initialization of the H matrix
 def initH(N,W,k):
     m = np.mean(W)
-    #H = np.random.uniform(0, 2 * np.sqrt(m / k), (N, k))
-    H = []
-    for i in range(N):
-        for j in range(k):
-            H.append(2 * np.sqrt(m / k) * np.random.uniform())    
+    H = np.random.uniform(0, 2 * np.sqrt(m / k), (N, k))
+    # H = []
+    # for i in range(N):
+    #     for j in range(k):
+    #         H.append(2 * np.sqrt(m / k) * np.random.uniform())    
+    H = H.flatten().tolist()
     return H
 
 #Performs full the symNMF 
