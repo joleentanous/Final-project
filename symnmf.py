@@ -13,16 +13,15 @@ np.random.seed(0)
 # module_symnmf:  args: (X, Y, N) where X and Y are  py lists (X with dim N*N, Y with dim N*k), N, k integers
 
 
+#error function with error message
 def error():
     print("An Error Has Occurred, python")
     exit()
 
+#reads data from user 
 def read(data):
-    print(2)
     df = pd.read_csv(data, header=None)
-    print(3)
     np_array = df.to_numpy()
-    print(np_array)
     return np_array
 
 
@@ -33,6 +32,7 @@ def initH(N,W,k):
     H = H.flatten().tolist()
     return H
 
+#Performs full the symNMF 
 def symnmf(X, N, k):
     A = sym(X, N, k)
     D = ddg(A, N)
@@ -40,7 +40,7 @@ def symnmf(X, N, k):
     H = initH(N,W,k)
     return g.module_symnmf(W, H, N, k)
 
-
+#prints to STDOUT 
 def printMatrix(matrix , N, K):
     matrix = np.array(matrix).reshape(N, K)
     matrix = [[round(num, 4) for num in row] for row in matrix]
@@ -68,14 +68,16 @@ if __name__ == "__main__":
     goals = ['symnmf', 'sym', 'ddg', 'norm']
     k = goal = file_name = None
     args = sys.argv
+    #input count validation
     if (len(args) != 4):
         error()
     k = (args[1])
     goal = (args[2])
     file_name = (args[3])
-    print(1)
     matrix = read(file_name)
     N = matrix.shape[0]
+    
+    #input validation
     try:
         k = int(k)
         goal = str(goal)
@@ -85,13 +87,10 @@ if __name__ == "__main__":
 
     if (k >= N) or (k <= 1) or (goal not in goals):
         error()
-
-
-
+        
     d = matrix.shape[1]
     matrix = matrix.flatten().tolist()
-    print(matrix)
-    print(4)
+    
     if goal == 'symnmf':
         res = symnmf(matrix,N,k)
         print(res)
