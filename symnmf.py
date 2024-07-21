@@ -15,7 +15,7 @@ np.random.seed(0)
 
 #error function with error message
 def error():
-    print("An Error Has Occurred, python")
+    print("An Error Has Occurred")
     exit()
 
 #reads data from user 
@@ -31,10 +31,8 @@ def initH(N,W,k):
     #H = np.random.uniform(0, 2 * np.sqrt(m / k), (N, k))
     H = []
     for i in range(N):
-        H.append([])
         for j in range(k):
-            H[j].append(2 * np.sqrt(m / k) * np.random.uniform())
-    H = H.flatten().tolist()
+            H.append(2 * np.sqrt(m / k) * np.random.uniform())    
     return H
 
 #Performs full the symNMF 
