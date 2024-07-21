@@ -37,11 +37,15 @@ def initH(N,W,k):
     return H
 
 #Performs full the symNMF 
-def symnmf(X, N, k):
-    A = sym(X, N, k)
+def symnmf(X, N, d, k):
+    A = sym(X, N, d)
+    print(A)
     D = ddg(A, N)
+    print(D)
     W = norm(A, D, N)
-    H = initH(N,W,k)
+    print(W)
+    H = initH(N, W, k)
+    print(H)
     return g.module_symnmf(W, H, N, k)
 
 #prints to STDOUT 
@@ -102,7 +106,7 @@ if __name__ == "__main__":
     matrix = matrix.flatten().tolist()
     
     if goal == 'symnmf':
-        res = symnmf(matrix,N,k)
+        res = symnmf(matrix, N, d, k)
         printMatrix(res, N, k)
     else:
         if goal == 'sym':
