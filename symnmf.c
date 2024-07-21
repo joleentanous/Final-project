@@ -253,7 +253,6 @@ Output: A matrix of dimension N*N represented by a 1d array of size N*N
 double* sym(double* X, int N, int d){
     double* A = (double*) createArray(N*N, sizeof(double));
     int i,j;
-    printf("Calling sym\n");
     for (i = 0; i<N; i++){
         double a_i_j;
         for(j=0; j<N; j++){
