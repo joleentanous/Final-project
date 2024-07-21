@@ -64,7 +64,7 @@ def norm(A, D, N):
 
 
 
-def main():
+if __name__ == "__main__":
     goals = ['symnmf', 'sym', 'ddg', 'norm']
     k = goal = file_name = None
     args = sys.argv
@@ -115,4 +115,3 @@ def main():
 # except Exception as e:
 #     error()
 
-main()

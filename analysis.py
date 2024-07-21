@@ -4,7 +4,6 @@ import pandas as pd
 from sklearn.metrics import silhouette_score
 import kmeans
 import symnmf
-
 ITER = 200
 
 
@@ -23,26 +22,24 @@ def read(data):
 def symnmf_clustering(matrix, N, k):
     print("symnmf_clus")
     D_matrix = matrix.flatten().tolist()
-    print(1)
     symnmf_H = np.array(symnmf.symnmf(D_matrix, N, k))
-    print(2)
+    symnmf_H = symnmf_H.reshape((N, k))    
     indices = symnmf_H.argmax(axis=1)
     print(indices)
     return indices
 
 def kmeans_clustering(matrix, N, k, d):
-    print("kmeans clus")
     centroids = kmeans.k_means(k, N, d, ITER, matrix)   
     indices = []
     print(centroids)
     for datapoint in matrix:
         indices.append(kmeans.find_closest_centroid_index(centroids, datapoint))
+    print(11)
     print(indices)
     return indices
 
 
-if __name__ == "__main__":
-    print("hi")
+def main():
     args = sys.argv
     if (len(args) != 3):
         error()
@@ -66,9 +63,9 @@ if __name__ == "__main__":
     print("nmf: %.4f" % silhouette_score(matrix, symnmf_clusters))
     print("kmeans: %.4f" % silhouette_score(matrix, kmeans_clusters))
 
+main()
 
-
-
+# main()
 
 # import sys
 # import numpy as np
