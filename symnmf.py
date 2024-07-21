@@ -16,9 +16,13 @@ np.random.seed(0)
 def error():
     print("An Error Has Occurred")
     exit()
+
 def read(data):
+    print(2)
     df = pd.read_csv(data, header=None)
+    print(3)
     np_array = df.to_numpy()
+    print(np_array)
     return np_array
 
 
@@ -34,7 +38,7 @@ def symnmf(X, N, k):
     D = ddg(A, N)
     W = norm(A, D, N)
     H = initH(W,k)
-    return g.symnmf(W, H, N, k)
+    return g.module_symnmf(W, H, N, k)
 
 
 def printMatrix(matrix):
@@ -45,15 +49,15 @@ def printMatrix(matrix):
 
 
 def sym(X, N, d):
-    return g.sym(X,N,d)
+    return g.module_sym(X,N,d)
 
 
 def ddg(A, N):
-    return g.ddg(A, N)
+    return g.module_ddg(A, N)
 
 
 def norm(A, D, N):
-    return g.norm(A, D, N)
+    return g.module_norm(A, D, N)
 
 
 
@@ -67,6 +71,7 @@ def main():
     k = (args[1])
     goal = (args[2])
     file_name = (args[3])
+    print(1)
     matrix = read(file_name)
     N = matrix.shape[0]
     try:
@@ -82,8 +87,12 @@ def main():
 
 
     d = matrix.shape[1]
+    matrix = matrix.flatten().tolist()
+    print(matrix)
+    print(4)
     if goal == 'symnmf':
         res = symnmf(matrix,k)
+        print(matrix)
         printMatrix(res)
     else:
         if goal == 'sym':
