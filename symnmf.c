@@ -34,7 +34,7 @@ char* read_line(FILE* file) {
     int ch;
 
     if (buffer == NULL) {
-        perror("Unable to allocate buffer");
+        perror(ERROR_MSG);
         exit(EXIT_FAILURE);
     }
 
@@ -44,7 +44,7 @@ char* read_line(FILE* file) {
             buffer_size *= 2;
             buffer = (char*)realloc(buffer, buffer_size * sizeof(char));
             if (buffer == NULL) {
-                perror("Unable to reallocate buffer");
+                perror(ERROR_MSG);
                 exit(EXIT_FAILURE);
             }
         }
@@ -67,7 +67,7 @@ void count_rows_and_columns(const char* file_name, int* rows, int* cols) {
 
     file = fopen(file_name, "r");
     if (file == NULL) {
-        perror("Error opening file");
+        perror(ERROR_MSG);
         exit(EXIT_FAILURE);
     }
 
@@ -85,7 +85,7 @@ void count_rows_and_columns(const char* file_name, int* rows, int* cols) {
         if (*cols == 0) {
             *cols = temp_cols;
         } else if (temp_cols != *cols) {
-            fprintf(stderr, "Inconsistent number of columns\n");
+            perror(ERROR_MSG);
             free(line);
             exit(EXIT_FAILURE);
         }
@@ -104,7 +104,7 @@ void read_data(const char* file_name, double* data, int rows, int cols) {
     cols = cols;
     file = fopen(file_name, "r");
     if (file == NULL) {
-        perror("Error opening file");
+        perror(ERROR_MSG);
         exit(EXIT_FAILURE);
     }
 
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     double* Normalized;
 
     if (argc != 3) {
-        fprintf(stderr, "Usage: %s <operation> <file_name>\n", argv[0]);
+        perror(ERROR_MSG);
         return EXIT_FAILURE;
     }
 
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
 
     data = (double*)malloc((size_t)(N * d) * sizeof(double));
     if (data == NULL) {
-        perror("Memory allocation failed");
+        perror(ERROR_MSG);
         return EXIT_FAILURE;
     }
 
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
     }
 
     else{
-        printf(ERROR_MSG);
+        perror(ERROR_MSG);
         free(data);
         exit(1);
     }
