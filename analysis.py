@@ -8,7 +8,7 @@ ITER = 200
 
 #error func with error message 
 def error():
-    print("An Error Has Occurred, analysis")
+    print("An Error Has Occurred")
     exit()
 
 
@@ -65,4 +65,3 @@ def main():
     print("kmeans: %.4f" % silhouette_score(matrix, kmeans_clusters))
 
 main()
-
