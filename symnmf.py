@@ -14,7 +14,7 @@ np.random.seed(0)
 
 
 def error():
-    print("An Error Has Occurred")
+    print("An Error Has Occurred, python")
     exit()
 
 def read(data):
@@ -27,21 +27,23 @@ def read(data):
 
 
 #initialization of the H matrix
-def initH(W,k):
-    n = W.shape[0]
+def initH(N,W,k):
     m = np.mean(W)
-    H = np.random.uniform(0, 2 * np.sqrt(m / k), (n, k))
+    H = np.random.uniform(0, 2 * np.sqrt(m / k), (N, k))
+    H = H.flatten().tolist()
     return H
 
 def symnmf(X, N, k):
     A = sym(X, N, k)
     D = ddg(A, N)
     W = norm(A, D, N)
-    H = initH(W,k)
+    H = initH(N,W,k)
     return g.module_symnmf(W, H, N, k)
 
 
-def printMatrix(matrix):
+def printMatrix(matrix , N, K):
+    matrix = np.array(matrix).reshape(N, K)
+    matrix = [[round(num, 4) for num in row] for row in matrix]
     for row in matrix:
         print(",".join(map(str, row)))
     print("")
@@ -91,9 +93,9 @@ def main():
     print(matrix)
     print(4)
     if goal == 'symnmf':
-        res = symnmf(matrix,k)
-        print(matrix)
-        printMatrix(res)
+        res = symnmf(matrix,N,k)
+        print(res)
+        printMatrix(res, N, k)
     else:
         if goal == 'sym':
             res = sym(matrix,N,d)
@@ -106,9 +108,11 @@ def main():
             res = norm(A, D, N)
         else:
             error()
-        printMatrix(res)
+        printMatrix(res, N, N)
 
-try:
-    main()
-except Exception as e:
-    error()
+# try:
+#     main()
+# except Exception as e:
+#     error()
+
+main()
