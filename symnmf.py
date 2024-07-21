@@ -74,6 +74,8 @@ if __name__ == "__main__":
     k = (args[1])
     goal = (args[2])
     file_name = (args[3])
+    if not file_name.endswith('.txt'):  # check filename extension
+        error()
     matrix = read(file_name)
     N = matrix.shape[0]
     
