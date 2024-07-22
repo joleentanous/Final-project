@@ -22,8 +22,6 @@ void transpose_matrix(double* A, double* transposed, int N, int d);
 double frobenius_norm(double* H, double* H_next, int N, int k);
 double* symnmf(double* W, double* H, int N, int k);
 void copyArray(double* A, double* B, int size);
-void matrix_product_HHT(double* H, double* HHT, int N, int k);
-void matrix_product_WH(double* W, double* H, double* WH, int N, int k);
 
 
 #define INITIAL_BUFFER_SIZE 128
@@ -151,12 +149,14 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(operation, "sym") == 0){
         similarity = sym(data, N, d);
+        printMatrix(similarity, N, N);
         free(similarity);
         
     }
     else if (strcmp(operation, "ddg") == 0){
         similarity = sym(data, N, d);
         Diagonal = ddg(similarity, N);
+        printMatrix(Diagonal, N, N);
         free(similarity);
         free(Diagonal);
 
@@ -165,6 +165,7 @@ int main(int argc, char *argv[]) {
         similarity = sym(data, N, d);
         Diagonal = ddg(similarity, N);
         Normalized = norm(similarity,Diagonal, N);
+        printMatrix(Normalized, N, N);
         free(similarity);
         free(Diagonal);
         free(Normalized);
@@ -179,48 +180,6 @@ int main(int argc, char *argv[]) {
     
     return 0;
 }
-
-
-/*int main() {
-    int N = 3;
-    int k = 2;
-
-    double W[] = {
-        0.0, 0.7, 0.0,
-        0.7, 0.0, 0.7,
-        0.0, 0.7, 0.0
-    };
-
-    double H[] = {
-        0.5, 0.6,
-        0.3, 0.8,
-        0.9, 0.1
-    };
-
-    double expected_H[] = {
-        0.2045, 0.4100,
-        0.6200, 0.8200,
-        0.1020, 0.3060
-    };
-
-    double* optimized_H = symnmf(W, H, N, k);
-
-    printf("Expected H Matrix:\n");
-    printMatrix(expected_H, N, k);
-
-    printf("Optimized H Matrix:\n");
-    printMatrix(optimized_H, N, k);
-
-    double diff_norm = frobenius_norm(expected_H, optimized_H, N, k);
-    printf("Frobenius Norm of the Difference: %.6f\n", diff_norm);
-
-    free(optimized_H);
-
-    return 0;
-}*/
-
-
-
 
 
 
@@ -437,28 +396,4 @@ double frobenius_norm(double* H, double* H_next, int N, int k) {
         norm += (H_next[i] - H[i]) * (H_next[i] - H[i]);
     }
     return norm;
-}
-
-void matrix_product_WH(double* W, double* H, double* WH, int N, int k) {
-    int i,j,l;
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < k; j++) {
-            WH[i * k + j] = 0.0;
-            for (l = 0; l < N; l++) {
-                WH[i * k + j] += W[i * N + l] * H[l * k + j];
-            }
-        }
-    }
-}
-
-void matrix_product_HHT(double* H, double* HHT, int N, int k) {
-    int i,j,l;
-    for (i = 0; i < N; i++) {
-        for (j = 0; j < N; j++) {
-            HHT[i * N + j] = 0.0;
-            for (l = 0; l < k; l++) {
-                HHT[i * N + j] += H[i * k + l] * H[j * k + l];
-            }
-        }
-    }
 }
