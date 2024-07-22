@@ -51,8 +51,6 @@ def printMatrix(matrix , N, K):
     for row in matrix:
         fixedRow = ["%.4f" % num for num in row]
         print(",".join(map(str, fixedRow)))
-    print("")
-
 
 
 def sym(X, N, d):
