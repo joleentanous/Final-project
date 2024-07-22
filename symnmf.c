@@ -25,6 +25,7 @@ void copyArray(double* A, double* B, int size);
 
 
 #define INITIAL_BUFFER_SIZE 128
+/*in this file, we used 1D arrays representing the matrices*/
 
 char* read_line(FILE* file) {
     size_t buffer_size = INITIAL_BUFFER_SIZE;
