@@ -1,33 +1,11 @@
-# Compiler and flags
-CC = gcc
-CFLAGS = -ansi -Wall -Wextra -Werror -pedantic-errors
-LDFLAGS = -lm
+symnmf: symnmf.o symnmf.h
+	@echo "Building symnmf"
+	@gcc -o symnmf symnmf.o -lm
 
-# Target executable
-TARGET = symnmf
+symnmf.o: symnmf.c
+	@echo "Compiling symnmf.c"
+	@gcc -ansi -Wall -Wextra -Werror -pedantic-errors -c symnmf.c 
 
-# Source files
-SRCS = symnmf.c
-
-# Header files
-HDRS = symnmf.h
-
-# Object files
-OBJS = $(SRCS:.c=.o)
-
-# Default target to build the executable
-all: $(TARGET)
-
-# Build target executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
-
-# Compile source files to object files
-%.o: %.c $(HDRS)
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Clean up build artifacts
 clean:
-	rm -f $(TARGET) $(OBJS)
-
-.PHONY: all clean
+	@echo "Cleaning up"
+	@rm -f *.o symnmf
