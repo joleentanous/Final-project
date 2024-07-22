@@ -39,13 +39,9 @@ def initH(N,W,k):
 #Performs full the symNMF 
 def symnmf(X, N, d, k):
     A = sym(X, N, d)
-    print(A)
     D = ddg(A, N)
-    print(D)
     W = norm(A, D, N)
-    print(W)
     H = initH(N, W, k)
-    print(H)
     return g.module_symnmf(W, H, N, k)
 
 #prints to STDOUT 

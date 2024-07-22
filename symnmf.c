@@ -151,14 +151,12 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(operation, "sym") == 0){
         similarity = sym(data, N, d);
-        printMatrix(similarity, N, N);
         free(similarity);
         
     }
     else if (strcmp(operation, "ddg") == 0){
         similarity = sym(data, N, d);
         Diagonal = ddg(similarity, N);
-        printMatrix(Diagonal, N, N);
         free(similarity);
         free(Diagonal);
 
@@ -167,7 +165,6 @@ int main(int argc, char *argv[]) {
         similarity = sym(data, N, d);
         Diagonal = ddg(similarity, N);
         Normalized = norm(similarity,Diagonal, N);
-        printMatrix(Normalized, N, N);
         free(similarity);
         free(Diagonal);
         free(Normalized);
@@ -309,31 +306,13 @@ double* symnmf(double* W, double* H, int N, int k ){
     double* HH_TH = createArray(N*k, sizeof(double));
 
     for(iter=0; iter < ITER; iter ++){
-        /*printf("W:\n");
-        printMatrix(W, N, N);*/
         int i;
         int j;
         double diff;
         matrix_multiply(W, H_curr, WH, N, N, k);
-        /*printf("WH:\n");
-        printMatrix(WH, N, k);
-        printf("H_curr:\n");
-        printMatrix(H_curr, N, k);*/
         transpose_matrix(H_curr, H_transposed, N, k);
-        /*printf("H_transposed:\n");
-        printMatrix(H_transposed, k, N);
-        printf("H_curr:\n");
-        printMatrix(H_curr, N, k);*/
         matrix_multiply(H_curr, H_transposed, HH_T, N, k, N);
-        /*printf("HH_T:\n");
-        printMatrix(HH_T, N, N);
-        printf("H_curr:\n");
-        printMatrix(H_curr, N, k);*/
         matrix_multiply(HH_T, H_curr, HH_TH, N, N, k);
-        /*printf("HH_TH:\n");
-        printMatrix(HH_TH, N, k);
-        printf("H_curr:\n");
-        printMatrix(H_curr, N, k);*/
         for(i=0; i<N; i++){
             for(j=0; j<k; j++){
                 /*check division by zero*/
@@ -342,12 +321,6 @@ double* symnmf(double* W, double* H, int N, int k ){
             }
         }
         diff = frobenius_norm(H_curr, H_next, N, k);
-        printf("joleens frobs then H:\n");    
-        printf("forbs val:  %f\n", diff);
-        /*printf("H_next:\n");
-        printMatrix(H_next, N, k);
-        printf("forbs val:  %f\n", diff);*/
-        printMatrix(H_next, N, k);
         copyArray(H_next, H_curr, N*k);
         if (diff < EPSILON)
             break;
