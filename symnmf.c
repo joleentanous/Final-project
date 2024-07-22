@@ -290,6 +290,7 @@ double* symnmf(double* W, double* H, int N, int k ){
     free(H_transposed);
     free(HH_T);
     free(HH_TH);
+    free(H_next);
     return H_curr;
 }
 
