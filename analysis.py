@@ -20,9 +20,9 @@ def read(data):
 
 
 #calculates the centroids using kmeans, outputs the indices of the vectors' clusters respectively 
-def symnmf_clustering(matrix, N, k):
+def symnmf_clustering(matrix, N, d, k):
     D_matrix = matrix.flatten().tolist()
-    symnmf_H = np.array(symnmf.symnmf(D_matrix, N, k))
+    symnmf_H = np.array(symnmf.symnmf(D_matrix, N, d, k))
     symnmf_H = symnmf_H.reshape((N, k))    
     indices = symnmf_H.argmax(axis=1)
     return indices
@@ -58,7 +58,7 @@ def main():
 
     #final indices 
     kmeans_clusters = kmeans_clustering(matrix, N, k ,d)  # calculating the centroids using kmeans
-    symnmf_clusters = symnmf_clustering(matrix, N ,k)  # calculating the centroids using symnmf
+    symnmf_clusters = symnmf_clustering(matrix, N ,d, k)  # calculating the centroids using symnmf
 
     #calculates the silhouette_score using sklearn.metrics 
     print("nmf: %.4f" % silhouette_score(matrix, symnmf_clusters))
