@@ -122,7 +122,6 @@ void read_data(const char* file_name, double* data, int rows, int cols) {
 }
 
 
-
 int main(int argc, char *argv[]) {
     const char* operation;
     const char* file_name;
@@ -186,20 +185,13 @@ int main(int argc, char *argv[]) {
 
 
 /*int main() {
-
     int N = 3;
-    int d = 2;
+    int k = 2;
 
-    double X[] = {
-        1.0, 2.0,
-        3.0, 4.0,
-        5.0, 6.0
-    };
-
-        double W[] = {
-        0.000000, 0.707105, 0.000006,
-        0.707105, 0.000000, 0.707105,
-        0.000006, 0.707105, 0.000000
+    double W[] = {
+        0.0, 0.7, 0.0,
+        0.7, 0.0, 0.7,
+        0.0, 0.7, 0.0
     };
 
     double H[] = {
@@ -208,39 +200,30 @@ int main(int argc, char *argv[]) {
         0.9, 0.1
     };
 
-    double* similarityMatrix;
-    double* ddg_matrix;
-    double* normalized_matrix;
-    double* optimizedH ;
+    double expected_H[] = {
+        0.2045, 0.4100,
+        0.6200, 0.8200,
+        0.1020, 0.3060
+    };
 
-    similarityMatrix = sym(X, N, d);
+    double* optimized_H = symnmf(W, H, N, k);
 
-    printf("Similarity Matrix:\n");
-    printMatrix(similarityMatrix, N, N);
-
-    ddg_matrix = ddg(similarityMatrix, N);
-
-    printf("DDG Matrix:\n");
-    printMatrix(ddg_matrix, N, N);
-
-    printf("Normalized Matrix:\n");
-    normalized_matrix = norm(similarityMatrix, ddg_matrix, N);
-    printMatrix(normalized_matrix, N, N);
-    free(similarityMatrix);
-    free(ddg_matrix);
-
-    N = 3; 
-    d = 2;
-
-    optimizedH = symnmf(W, H, N, d);
+    printf("Expected H Matrix:\n");
+    printMatrix(expected_H, N, k);
 
     printf("Optimized H Matrix:\n");
-    printMatrix(optimizedH, N, d);
+    printMatrix(optimized_H, N, k);
 
-    free(optimizedH);
+    double diff_norm = frobenius_norm(expected_H, optimized_H, N, k);
+    printf("Frobenius Norm of the Difference: %.6f\n", diff_norm);
+
+    free(optimized_H);
 
     return 0;
 }*/
+
+
+
 
 
 
@@ -326,23 +309,45 @@ double* symnmf(double* W, double* H, int N, int k ){
     double* HH_TH = createArray(N*k, sizeof(double));
 
     for(iter=0; iter < ITER; iter ++){
+        /*printf("W:\n");
+        printMatrix(W, N, N);*/
         int i;
         int j;
         double diff;
         matrix_multiply(W, H_curr, WH, N, N, k);
+        /*printf("WH:\n");
+        printMatrix(WH, N, k);
+        printf("H_curr:\n");
+        printMatrix(H_curr, N, k);*/
         transpose_matrix(H_curr, H_transposed, N, k);
+        /*printf("H_transposed:\n");
+        printMatrix(H_transposed, k, N);
+        printf("H_curr:\n");
+        printMatrix(H_curr, N, k);*/
         matrix_multiply(H_curr, H_transposed, HH_T, N, k, N);
+        /*printf("HH_T:\n");
+        printMatrix(HH_T, N, N);
+        printf("H_curr:\n");
+        printMatrix(H_curr, N, k);*/
         matrix_multiply(HH_T, H_curr, HH_TH, N, N, k);
+        /*printf("HH_TH:\n");
+        printMatrix(HH_TH, N, k);
+        printf("H_curr:\n");
+        printMatrix(H_curr, N, k);*/
         for(i=0; i<N; i++){
             for(j=0; j<k; j++){
+                /*check division by zero*/
                 double alpha = (1 - BETA  + BETA*( WH[get_1d_index(i, j, k)] / HH_TH[get_1d_index(i, j, k)]));
                 H_next[i*k + j] = H_curr[i*k+j] * alpha;
             }
         }
-        diff = frobenius_norm(H_next, H_curr, N, k);
-        printf("The frobenius is: %f\n", diff);
-        printf("%s", "H_in joleen and tamer");
-        printMatrix(H_curr,N,k);
+        diff = frobenius_norm(H_curr, H_next, N, k);
+        printf("joleens frobs then H:\n");    
+        printf("forbs val:  %f\n", diff);
+        /*printf("H_next:\n");
+        printMatrix(H_next, N, k);
+        printf("forbs val:  %f\n", diff);*/
+        printMatrix(H_next, N, k);
         copyArray(H_next, H_curr, N*k);
         if (diff < EPSILON)
             break;
@@ -355,9 +360,7 @@ double* symnmf(double* W, double* H, int N, int k ){
     return H_curr;
 }
 
-int get_1d_index(int i, int j, int d){
-    return i*d+j;
-}
+
 
 void matrix_multiply(double* A, double* B, double* C, int N, int d, int K) {
     int i,j,k;
@@ -391,6 +394,11 @@ int get_1d_index(int i, int j, int d){
 }
 void transpose_matrix(double* A, double* transposed, int N, int d) {
     int i,j;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < d; j++) {
+            transposed[j * N + i] = 0;
+        }
+    }
     for (i = 0; i < N; i++) {
         for (j = 0; j < d; j++) {
             transposed[j * N + i] = A[i * d + j];
@@ -433,15 +441,13 @@ double euc_l2(double *v1, double *v2, int d)
     return sqrt(dist);
 }
 
-int get_1d_index(int i, int j, int d){
-    return i*d+j;
-}
+
 
 
 void printMatrix(double* matrix, int rows, int cols) {
     int i, j;
-    for (i = 0; i < rows; ++i) {
-        for (j = 0; j < cols; ++j) {
+    for (i = 0; i < rows; ++i) { /*maybe needs to be changed*/
+        for (j = 0; j < cols; ++j) { /*maybe needs to be changed*/
             printf("%.4f", matrix[i * cols + j]);
             if (j < cols - 1) printf(",");
         }
@@ -455,9 +461,9 @@ double frobenius_norm(double* H, double* H_next, int N, int k) {
     int i;
     double norm = 0.0;
     for (i = 0; i < N * k; i++) {
-        norm += (H[i] - H_next[i]) * (H[i] - H_next[i]);
+        norm += (H_next[i] - H[i]) * (H_next[i] - H[i]);
     }
-    return sqrt(norm);
+    return norm;
 }
 
 void matrix_product_WH(double* W, double* H, double* WH, int N, int k) {
@@ -483,4 +489,3 @@ void matrix_product_HHT(double* H, double* HHT, int N, int k) {
         }
     }
 }
-
